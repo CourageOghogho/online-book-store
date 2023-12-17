@@ -6,9 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
-public class Genre extends BaseModel{
+@AllArgsConstructor
+@NoArgsConstructor
+public class Author extends BaseModel{
   private String name;
 }

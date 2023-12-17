@@ -1,12 +1,13 @@
 package com.interswitchng.onlinebookstore.model;
 
+import java.util.List;
 import lombok.Data;
 
 @Data
 public class Book extends BaseModel{
   private String title;
-  private Genre genre;
+  private Integer genreId;
   private String isbn;
-  private String author;
-  private int yearOfPublication;
+  private Integer yearOfPublication;
+  private Integer authorId;
 }
