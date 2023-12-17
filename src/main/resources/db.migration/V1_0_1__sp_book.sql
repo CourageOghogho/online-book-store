@@ -12,10 +12,10 @@ CREATE PROCEDURE psp_create_book
   @year_of_publication             INT,
   @genre_id                        BIGINT,
   @author_id                       BIGINT,
-
+  @available_book_count            BIGINT
 AS
-  INSERT INTO tbl_book (title, isbn, year_of_publication, genre_id, author_id,date_created)
-  VALUES (@title, @isbn, @year_of_publication, @genre_id, @author_id GETDATE())
+  INSERT INTO tbl_book (title, isbn, year_of_publication, genre_id, author_id,date_created,available_book_count)
+  VALUES (@title, @isbn, @year_of_publication, @genre_id, @author_id GETDATE(),@available_book_count)
 
 SELECT @book_id = SCOPE_IDENTITY();
 RETURN @@Error

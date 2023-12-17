@@ -29,6 +29,7 @@ public class BookRowMapper implements RowMapper<BookResponse> {
     book.setTitle(rs.getString("title"));
     book.setIsbn(rs.getString("isbn"));
     book.setYearOfPublication(rs.getInt("year_of_publication"));
+    book.setAvailableCount(rs.getInt("available_book_count"));
     book.setAuthor(author);
     book.setGenre(genre);
 

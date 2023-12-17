@@ -10,4 +10,5 @@ public class Book extends BaseModel{
   private String isbn;
   private Integer yearOfPublication;
   private Integer authorId;
+  private Integer availableBookCount;
 }

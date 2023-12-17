@@ -28,6 +28,7 @@ CREATE TABLE tbl_book
     year_of_publication INT NOT NULL,
     genre_id INT FOREIGN KEY REFERENCES tbl_genre(genre_id),
     author_id  INT FOREIGN KEY REFERENCES tbl_author(author_id),
+    available_book_count INT NOT NULL DEFAULT 0,
     date_created   DATETIME DEFAULT CURRENT_TIMESTAMP
 )
 GO
@@ -54,7 +55,6 @@ CREATE TABLE tbl_user
 (
     user_id INT IDENTITY (1, 1) PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
     created_on DATE DEFAULT CURRENT_TIMESTAMP
 )
 GO
@@ -62,8 +62,10 @@ GO
 IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'tbl_shopping_cart') AND type IN (N'U'))
 CREATE TABLE tbl_shopping_cart
 (
-    cart_id INT IDENTITY (1, 1) PRIMARY KEY,
-    user_id INT FOREIGN KEY REFERENCES tbl_user(user_id)
+    cart_id INT PRIMARY KEY,
+    user_id INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES User(user_id)
 )
 GO
 
@@ -71,10 +73,13 @@ GO
 IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'tbl_shopping_cart_item') AND type IN (N'U'))
 CREATE TABLE tbl_shopping_cart_item
 (
-    item_id INT IDENTITY (1, 1) PRIMARY KEY,
-    cart_id INT FOREIGN KEY REFERENCES tbl_shopping_cart(cart_id),
-    book_id INT FOREIGN KEY REFERENCES tbl_book(book_id),
-    quantity INT NOT NULL
+    item_id INT PRIMARY KEY,
+    cart_id INT,
+    book_id INT,
+    quantity INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (cart_id) REFERENCES ShoppingCart(cart_id),
+    FOREIGN KEY (book_id) REFERENCES Book(book_id)
 )
 GO
 

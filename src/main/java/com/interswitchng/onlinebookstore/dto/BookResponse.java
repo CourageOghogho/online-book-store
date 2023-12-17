@@ -12,5 +12,6 @@ public class BookResponse extends BaseModel {
   private Integer yearOfPublication;
   private Author author;
   private Genre genre;
+  private Integer availableCount;
 
 }

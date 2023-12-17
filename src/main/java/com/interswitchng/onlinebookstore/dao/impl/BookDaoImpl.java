@@ -7,9 +7,7 @@ import com.interswitchng.onlinebookstore.dao.util.RowCountMapper;
 import com.interswitchng.onlinebookstore.dto.BookResponse;
 import com.interswitchng.onlinebookstore.dto.BookSearchParams;
 import com.interswitchng.onlinebookstore.exceptions.NotFoundException;
-import com.interswitchng.onlinebookstore.model.Author;
 import com.interswitchng.onlinebookstore.model.Book;
-import com.interswitchng.onlinebookstore.model.Genre;
 import com.interswitchng.onlinebookstore.model.Page;
 import com.interswitchng.onlinebookstore.utils.OnlineBookStoreResponseCode;
 import java.util.List;
@@ -79,6 +77,7 @@ public class BookDaoImpl extends BaseDao<BookResponse> implements BookDao {
         .addValue("genre_id", model.getGenreId())
         .addValue("author_id", model.getAuthorId())
         .addValue(ISBN, model.getIsbn())
+        .addValue("available_book_count",model.getAvailableBookCount())
         .addValue(YEAR_OF_PUBLICATION, model.getYearOfPublication());
 
     Map<String, Object> m = createJdbcCall.execute(in);
@@ -87,9 +86,6 @@ public class BookDaoImpl extends BaseDao<BookResponse> implements BookDao {
 
     return model;
   }
-
-
-
 
   public Page<BookResponse> searchBooksByIsbn(BookSearchParams params) {
     SqlParameterSource in = new MapSqlParameterSource()

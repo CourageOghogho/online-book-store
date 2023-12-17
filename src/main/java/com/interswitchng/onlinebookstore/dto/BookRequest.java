@@ -28,6 +28,8 @@ public class BookRequest {
   private Integer authorId;
 
   private String authorName;
+  @Positive(message = "Initial count must be a positive integer")
+  private Integer initialCount;
 
 
 }
