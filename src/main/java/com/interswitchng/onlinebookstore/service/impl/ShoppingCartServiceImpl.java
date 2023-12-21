@@ -9,8 +9,10 @@ import com.interswitchng.onlinebookstore.exceptions.ServiceLayerException;
 import com.interswitchng.onlinebookstore.model.CartItem;
 import com.interswitchng.onlinebookstore.model.OnlineBookStoreResponseCode;
 import com.interswitchng.onlinebookstore.model.ShoppingCart;
+import com.interswitchng.onlinebookstore.model.User;
 import com.interswitchng.onlinebookstore.service.BookService;
 import com.interswitchng.onlinebookstore.service.ShoppingCartService;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -61,8 +63,18 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
   }
 
   @Override
-  public ShoppingCartResponse getCartContents(Integer userId) {
-    return shoppingCartDao.retrieveCartItemsByUserId(userId);
+  public ShoppingCartResponse getCartContents(User user) {
+
+    var cart=shoppingCartDao.retrieveCartByUserId(user.getId());
+
+    var cartItems=shoppingCartDao.retrieveCartItemsByCartId(cart.getId());
+
+    var cartResponse=new ShoppingCartResponse();
+    cartResponse.setItems(cartItems);
+    cartResponse.setCartId(cart.getId());
+    cartResponse.setUserName(user.getUserName());
+
+    return cartResponse;
   }
 
   @Override

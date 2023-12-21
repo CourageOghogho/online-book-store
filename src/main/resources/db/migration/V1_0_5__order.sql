@@ -41,8 +41,8 @@ CREATE PROCEDURE psp_create_order
     @user_id INT,
     @reference_id VARCHAR(50),
     @order_status INT,
-    @total_amount DECIMAL(10, 2),
-    @quantity_ordered INT
+    @total_amount DECIMAL(10, 2)
+
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -63,7 +63,7 @@ SELECT
 FROM tbl_shopping_cart_item sci
 WHERE sci.cart_id IN (SELECT cart_id FROM tbl_shopping_cart WHERE user_id = @user_id);
 
-INSERT INTO tbl_order_history (order_id, order_reference_id, status, update_date, book_id, title, author_name, user_id, total_amount, quantity_ordered)
+INSERT INTO tbl_order_history (order_id, order_reference_id, status, update_date, book_id, title, author_name, user_id, total_amount)
 SELECT
     @order_id,
     @reference_id,
@@ -73,8 +73,7 @@ SELECT
     b.title,
     a.author_name,
     @user_id,
-    @total_amount,
-    @quantity_ordered
+    @total_amount
 FROM tbl_shopping_cart_item sci
          JOIN tbl_book b ON sci.book_id = b.book_id
          JOIN tbl_author a ON b.author_id = a.author_id

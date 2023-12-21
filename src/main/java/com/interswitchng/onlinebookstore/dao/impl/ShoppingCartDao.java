@@ -1,13 +1,17 @@
 package com.interswitchng.onlinebookstore.dao.impl;
 
 import com.interswitchng.onlinebookstore.dao.BaseDao;
+import com.interswitchng.onlinebookstore.dao.util.CartItemResponseRowMapper;
 import com.interswitchng.onlinebookstore.dao.util.CartItemRowMapper;
 import com.interswitchng.onlinebookstore.dao.util.CartRowMapper;
+import com.interswitchng.onlinebookstore.dao.util.GenreRowMapper;
 import com.interswitchng.onlinebookstore.dao.util.RowCountMapper;
 import com.interswitchng.onlinebookstore.dao.util.ShoppingCartResponseRowMapper;
+import com.interswitchng.onlinebookstore.dto.CartItemResponse;
 import com.interswitchng.onlinebookstore.dto.ShoppingCartResponse;
 import com.interswitchng.onlinebookstore.exceptions.NotFoundException;
 import com.interswitchng.onlinebookstore.model.CartItem;
+import com.interswitchng.onlinebookstore.model.Genre;
 import com.interswitchng.onlinebookstore.model.ShoppingCart;
 import com.interswitchng.onlinebookstore.utils.OnlineBookStoreResponseCode;
 import java.util.List;
@@ -30,6 +34,7 @@ public class ShoppingCartDao extends BaseDao<ShoppingCart> {
   private SimpleJdbcCall retrieveCartItemsByUserId;
   private SimpleJdbcCall addItem;
   private SimpleJdbcCall retrieveItemByIdJdbcCall;
+  private SimpleJdbcCall retrieveAllCartItemsByCartIdJdbcCall;
 
   @Autowired
   @Override
@@ -58,6 +63,10 @@ public class ShoppingCartDao extends BaseDao<ShoppingCart> {
         .returningResultSet(MULTIPLE_RESULT, new ShoppingCartResponseRowMapper())
         .returningResultSet(RESULT_COUNT, new RowCountMapper());
 
+    retrieveAllCartItemsByCartIdJdbcCall = new SimpleJdbcCall(jdbcTemplate).withProcedureName(
+            "psp_retrieve_all_cart_items_by_cart_id")
+        .returningResultSet(MULTIPLE_RESULT,
+            new CartItemResponseRowMapper());
 
   }
 
@@ -107,7 +116,7 @@ public class ShoppingCartDao extends BaseDao<ShoppingCart> {
 
     SqlParameterSource in = new MapSqlParameterSource()
 
-        .addValue("user_id",userId);
+        .addValue("userId",userId);
 
     Map<String, Object> m = retrieveCartItemsByUserId.execute(in);
     List<ShoppingCartResponse> content = (List<ShoppingCartResponse>) m.get(MULTIPLE_RESULT);
@@ -117,4 +126,13 @@ public class ShoppingCartDao extends BaseDao<ShoppingCart> {
     }
     return content.get(0);
   }
+
+  public List<CartItemResponse> retrieveCartItemsByCartId(Integer cartId) {
+
+    SqlParameterSource recList = new MapSqlParameterSource()
+        .addValue("cartId",cartId);
+    Map m = retrieveAllCartItemsByCartIdJdbcCall.execute(recList);
+    return (List<CartItemResponse>) m.get(MULTIPLE_RESULT);
+  }
+
 }

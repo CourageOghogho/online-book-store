@@ -11,10 +11,10 @@ public class CartRowMapper implements RowMapper<ShoppingCart> {
   public ShoppingCart mapRow(ResultSet rs, int rowNum) throws SQLException {
 
     ShoppingCart cart=new ShoppingCart();
-    cart.setUserId(rs.getInt("cart_id"));
-    cart.setId(rs.getInt("user_id"));
+    cart.setUserId(rs.getInt("user_id"));
+    cart.setId(rs.getInt("cart_id"));
     cart.setCreatedDate(rs.getDate("created_at"));
-    cart.setTotalPrice(rs.getBigDecimal("total_price"));
+//    cart.setTotalPrice(rs.getBigDecimal("total_price"));
     return cart;
   }
 }

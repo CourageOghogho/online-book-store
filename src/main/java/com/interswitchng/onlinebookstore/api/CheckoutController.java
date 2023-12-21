@@ -28,7 +28,7 @@ public class CheckoutController {
       @RequestParam Integer paymentMethod) {
 
     User user=userProvider.getSessionUser();
-    PaymentResponse order = checkoutService.processCheckout(user.getId(), paymentMethod);
+    PaymentResponse order = checkoutService.processCheckout(user, paymentMethod);
     return ResponseEntity.ok(order);
   }
 

@@ -30,6 +30,8 @@ public class CheckoutDao extends BaseDao<Order> {
   private SimpleJdbcCall retrieveOrderByReference;
 
   private SimpleJdbcCall updateOrder;
+  private SimpleJdbcCall saveOrderHistory;
+  private SimpleJdbcCall saveOrderItems;
 
   private SimpleJdbcCall clearCartByUserId;
 
@@ -39,10 +41,16 @@ public class CheckoutDao extends BaseDao<Order> {
   public void setDataSource(@Qualifier(value = "onlineBookStoreDs") DataSource dataSource) {
     this.jdbcTemplate = new JdbcTemplate(dataSource);
 
-
-
     saveOrder = new SimpleJdbcCall(jdbcTemplate)
         .withProcedureName("psp_create_order")
+        .returningResultSet(SINGLE_RESULT, new OrderRowMapper());
+
+    saveOrderItems = new SimpleJdbcCall(jdbcTemplate)
+        .withProcedureName("sp_save_order_items")
+        .returningResultSet(MULTIPLE_RESULT, new OrderRowMapper());
+
+    saveOrderHistory = new SimpleJdbcCall(jdbcTemplate)
+        .withProcedureName("sp_create_order_history")
         .returningResultSet(SINGLE_RESULT, new OrderRowMapper());
 
     updateOrder = new SimpleJdbcCall(jdbcTemplate)
@@ -68,7 +76,7 @@ public class CheckoutDao extends BaseDao<Order> {
         .addValue("order_status", order.getOrderStatus().getCode())
         .addValue("total_amount", order.getTotalAmount());
 
-    Map<String, Object> m = createJdbcCall.execute(in);
+    Map<String, Object> m = saveOrder.execute(in);
     List<Order> result = (List<Order>) m.get(SINGLE_RESULT);
     return result.isEmpty() ? null : result.get(0);
   }

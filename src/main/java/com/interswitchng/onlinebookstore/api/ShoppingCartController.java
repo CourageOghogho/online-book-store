@@ -23,7 +23,7 @@ public class ShoppingCartController {
   @GetMapping("cart/contents")
   ResponseEntity<ShoppingCartResponse> retrieveCartDetails(){
     var user=userProvider.getSessionUser();
-    return ResponseEntity.ok(cartService.getCartContents(user.getId()));
+    return ResponseEntity.ok(cartService.getCartContents(user));
   }
 
   @PutMapping("cart/contents/add")

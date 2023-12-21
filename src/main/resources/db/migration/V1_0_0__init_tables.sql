@@ -131,8 +131,7 @@ CREATE TABLE tbl_order_history (
     title VARCHAR(255),
     author_name VARCHAR(100),
     user_id INT,
-    total_amount DECIMAL(10, 2),
-    quantity_ordered INT
+    total_amount DECIMAL(10, 2)
 );
 
 CREATE INDEX idx_order_history_id ON tbl_order_history(order_id);

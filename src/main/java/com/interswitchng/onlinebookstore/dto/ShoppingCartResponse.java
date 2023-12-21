@@ -9,7 +9,7 @@ import lombok.Data;
 public class ShoppingCartResponse {
   private Integer cartId;
   private String userName;
-  private BigDecimal totalPrice;
+  private BigDecimal totalPrice= BigDecimal.ZERO;
 
   private List<CartItemResponse> items;
 

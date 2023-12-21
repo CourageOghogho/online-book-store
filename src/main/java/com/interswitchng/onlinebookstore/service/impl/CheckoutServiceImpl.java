@@ -11,10 +11,12 @@ import com.interswitchng.onlinebookstore.model.Order;
 import com.interswitchng.onlinebookstore.model.OrderStatus;
 import com.interswitchng.onlinebookstore.model.PaymentMethod;
 import com.interswitchng.onlinebookstore.model.PaymentStatus;
+import com.interswitchng.onlinebookstore.model.User;
 import com.interswitchng.onlinebookstore.service.BookService;
 import com.interswitchng.onlinebookstore.service.CheckoutService;
 import com.interswitchng.onlinebookstore.service.PaymentService;
 import com.interswitchng.onlinebookstore.service.PurchaseHistoryService;
+import com.interswitchng.onlinebookstore.service.ShoppingCartService;
 import com.interswitchng.onlinebookstore.utils.CustomModelMapper;
 import java.util.Objects;
 import java.util.UUID;
@@ -29,7 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class CheckoutServiceImpl implements CheckoutService {
-  private final ShoppingCartDao shoppingCartDao;
+  private final ShoppingCartService shoppingCartService;
   private final PurchaseHistoryService purchaseHistoryService;
   private final CheckoutDao checkoutDao;
   private final BookService bookService;
@@ -41,12 +43,12 @@ public class CheckoutServiceImpl implements CheckoutService {
 
   @Override
   @Transactional
-  public PaymentResponse processCheckout(Integer userId, Integer paymentMethod) {
+  public PaymentResponse processCheckout(User user, Integer paymentMethod) {
     var optionalPaymentMethod= PaymentMethod.get(paymentMethod).orElseThrow(
         ()->new NotFoundException(50000,"Invalid Payment method")
     );
 
-    var cart=shoppingCartDao.retrieveCartItemsByUserId(userId);
+    var cart=shoppingCartService.getCartContents(user);
     if (cart==null) throw new NotFoundException(50000,"No cart found for the user");
 
     for (CartItemResponse cartItem : cart.getItems()) {
@@ -63,11 +65,11 @@ public class CheckoutServiceImpl implements CheckoutService {
 
     var order=new Order();
     order.setOrderStatus(OrderStatus.INITIATED);
-    order.setUserId(userId);
+    order.setUserId(user.getId());
     order.setTotalAmount(cart.getTotalPrice());
     order.setReference(UUID.randomUUID().toString());
 
-    var cartContent=shoppingCartDao.retrieveCartItemsByUserId(userId);
+    var cartContent=shoppingCartService.getCartContents(user);
 
     var orderItems= cartContent.getItems().parallelStream()
             .map(CustomModelMapper::orderItemOfCartItem).toList();
