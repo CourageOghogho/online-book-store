@@ -4,13 +4,15 @@ import com.interswitchng.onlinebookstore.dao.BaseDao;
 import com.interswitchng.onlinebookstore.dao.util.CartItemRowMapper;
 import com.interswitchng.onlinebookstore.dao.util.CartRowMapper;
 import com.interswitchng.onlinebookstore.dao.util.RowCountMapper;
-import com.interswitchng.onlinebookstore.dto.BookResponse;
+import com.interswitchng.onlinebookstore.dao.util.ShoppingCartResponseRowMapper;
+import com.interswitchng.onlinebookstore.dto.ShoppingCartResponse;
 import com.interswitchng.onlinebookstore.exceptions.NotFoundException;
 import com.interswitchng.onlinebookstore.model.CartItem;
 import com.interswitchng.onlinebookstore.model.ShoppingCart;
 import com.interswitchng.onlinebookstore.utils.OnlineBookStoreResponseCode;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -27,6 +29,7 @@ public class ShoppingCartDao extends BaseDao<ShoppingCart> {
   private SimpleJdbcCall retrieveCartByUserId;
   private SimpleJdbcCall retrieveCartItemsByUserId;
   private SimpleJdbcCall addItem;
+  private SimpleJdbcCall retrieveItemByIdJdbcCall;
 
   @Autowired
   @Override
@@ -36,7 +39,11 @@ public class ShoppingCartDao extends BaseDao<ShoppingCart> {
 
     createJdbcCall = new SimpleJdbcCall(jdbcTemplate)
         .withProcedureName("psp_create_shopping_cart")
-        .returningResultSet(SINGLE_RESULT, BeanPropertyRowMapper.newInstance(ShoppingCart.class));
+        .returningResultSet(SINGLE_RESULT, new CartRowMapper());
+
+    retrieveItemByIdJdbcCall = new SimpleJdbcCall(jdbcTemplate)
+        .withProcedureName("psp_retrieve_item_by_item_id")
+        .returningResultSet(SINGLE_RESULT, new CartItemRowMapper());
 
     addItem = new SimpleJdbcCall(jdbcTemplate)
         .withProcedureName("psp_add_item_to_cart")
@@ -48,13 +55,34 @@ public class ShoppingCartDao extends BaseDao<ShoppingCart> {
 
     retrieveCartItemsByUserId = new SimpleJdbcCall(jdbcTemplate)
         .withProcedureName("psp_retrieve_cart_items_by_user_id")
-        .returningResultSet(MULTIPLE_RESULT, new CartItemRowMapper())
+        .returningResultSet(MULTIPLE_RESULT, new ShoppingCartResponseRowMapper())
         .returningResultSet(RESULT_COUNT, new RowCountMapper());
 
 
   }
 
-  public ShoppingCart retrieveCartByUserId(String userId) {
+
+
+  public ShoppingCart createCart(ShoppingCart cart) {
+
+    SqlParameterSource in = new MapSqlParameterSource()
+        .addValue("user_id", cart.getUserId());
+    Map<String, Object> m = createJdbcCall.execute(in);
+    Long id = (Long) m.get("cart_id");
+    cart.setId(id.intValue());
+
+    return cart;
+  }
+
+  public Optional<CartItem> retrieveItemById(Integer itemId){
+
+    SqlParameterSource in = new MapSqlParameterSource().addValue("item_id", itemId);
+    Map<String, Object> m = retrieveItemByIdJdbcCall.execute(in);
+    List<CartItem> result = (List<CartItem>) m.get(SINGLE_RESULT);
+    return Optional.of(result.isEmpty() ? null : result.get(0));
+
+  }
+  public ShoppingCart retrieveCartByUserId(Integer userId) {
     SqlParameterSource in = new MapSqlParameterSource().addValue("user_id", userId);
     Map<String, Object> m = retrieveCartByUserId.execute(in);
     List<ShoppingCart> result = (List<ShoppingCart>) m.get(SINGLE_RESULT);
@@ -64,28 +92,29 @@ public class ShoppingCartDao extends BaseDao<ShoppingCart> {
   public CartItem addItem(CartItem cartItem) {
 
     SqlParameterSource in = new MapSqlParameterSource()
+        .addValue("cart_id", cartItem.getCartId())
         .addValue("book_id", cartItem.getBookId())
-        .addValue("quantity",cartItem.getQuantity());
+        .addValue("quantity",cartItem.getQuantityInCart());
 
     Map<String, Object> m = addItem.execute(in);
-    Long id = (Long) m.get("book_id");
+    Long id = (Long) m.get("item_id");
     cartItem.setId(id.intValue());
 
     return cartItem;
   }
 
-  public List<CartItem> retrieveCartItemsByUserId(Integer userId) {
+  public ShoppingCartResponse retrieveCartItemsByUserId(Integer userId) {
 
     SqlParameterSource in = new MapSqlParameterSource()
 
         .addValue("user_id",userId);
 
     Map<String, Object> m = retrieveCartItemsByUserId.execute(in);
-    List<CartItem> content = (List<CartItem>) m.get(MULTIPLE_RESULT);
+    List<ShoppingCartResponse> content = (List<ShoppingCartResponse>) m.get(MULTIPLE_RESULT);
     if (content.isEmpty()) {
       throw new NotFoundException(OnlineBookStoreResponseCode.ENTITY_NOT_FOUND.getCode(),
           "Records not found");
     }
-    return content;
+    return content.get(0);
   }
 }

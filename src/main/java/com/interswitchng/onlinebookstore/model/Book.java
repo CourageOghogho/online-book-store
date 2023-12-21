@@ -1,5 +1,6 @@
 package com.interswitchng.onlinebookstore.model;
 
+import java.math.BigDecimal;
 import java.util.List;
 import lombok.Data;
 
@@ -11,4 +12,5 @@ public class Book extends BaseModel{
   private Integer yearOfPublication;
   private Integer authorId;
   private Integer availableBookCount;
+  private BigDecimal price;
 }

@@ -13,7 +13,7 @@ AS
   INSERT INTO tbl_genre (genre_name, date_created)
   VALUES (@genre_name, GETDATE())
 
-SELECT @genre_id = SCOPE_IDENTITY();
+SELECT * from tbl_genre where genre_id = SCOPE_IDENTITY();
 RETURN @@Error
     GO
 

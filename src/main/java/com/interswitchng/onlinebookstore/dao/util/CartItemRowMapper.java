@@ -16,16 +16,11 @@ public class CartItemRowMapper  implements RowMapper<CartItem> {
     cartItem.setId(rs.getInt("item_id"));
     cartItem.setCartId(rs.getInt("cart_id"));
     cartItem.setBookId(rs.getInt("book_id"));
-    cartItem.setQuantity(rs.getInt("quantity"));
+    cartItem.setQuantityInCart(rs.getInt("quantity"));
     cartItem.setCreatedDate(rs.getDate("created_at"));
+    cartItem.setPrice(rs.getBigDecimal("sub_total_price"));
 
 
-    Book book = new Book();
-    book.setTitle(rs.getString("book_title"));
-    book.setIsbn(rs.getString("book_isbn"));
-    book.setYearOfPublication(rs.getInt("book_year_of_publication"));
-
-    cartItem.setBook(book);
     return cartItem;
   }
 }

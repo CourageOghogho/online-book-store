@@ -12,26 +12,21 @@ public class BookRowMapper implements RowMapper<BookResponse> {
 
   @Override
   public BookResponse mapRow(ResultSet rs, int rowNum) throws SQLException {
-
-    BookResponse book =new BookResponse();
-
-    Genre genre=new Genre();
-    genre.setId(rs.getInt("genre_id"));
-    genre.setName(rs.getString("genre_name"));
-    genre.setCreatedDate(rs.getTimestamp("date_created") != null ? new Date(
-        rs.getTimestamp("date_created").getTime()) : null);
-
-    Author author=new Author();
-    author.setId(rs.getInt("author_id"));
-    author.setName(rs.getString("author_name"));
+    BookResponse book = new BookResponse();
 
     book.setId(rs.getInt("book_id"));
     book.setTitle(rs.getString("title"));
     book.setIsbn(rs.getString("isbn"));
     book.setYearOfPublication(rs.getInt("year_of_publication"));
     book.setAvailableCount(rs.getInt("available_book_count"));
-    book.setAuthor(author);
-    book.setGenre(genre);
+    book.setCreatedDate(rs.getTimestamp("date_created") != null ? new Date(
+        rs.getTimestamp("date_created").getTime()) : null);
+    book.setGenreId(rs.getInt("genre_id"));
+    book.setGenreName(rs.getString("genre_name"));
+    book.setAuthorId(rs.getInt("author_id"));
+    book.setAuthorName(rs.getString("author_name"));
+    book.setPrice(rs.getBigDecimal("price"));
+
 
     return book;
   }

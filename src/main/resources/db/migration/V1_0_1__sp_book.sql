@@ -1,4 +1,3 @@
-
 IF EXISTS(SELECT *
           FROM sys.objects
           WHERE object_id = OBJECT_ID(N'psp_create_book') AND type IN (N'P', N'PC'))
@@ -12,12 +11,13 @@ CREATE PROCEDURE psp_create_book
   @year_of_publication             INT,
   @genre_id                        BIGINT,
   @author_id                       BIGINT,
-  @available_book_count            BIGINT
+  @available_book_count            BIGINT,
+  @price                           DECIMAL(10, 2)
 AS
-  INSERT INTO tbl_book (title, isbn, year_of_publication, genre_id, author_id,date_created,available_book_count)
-  VALUES (@title, @isbn, @year_of_publication, @genre_id, @author_id GETDATE(),@available_book_count)
+  INSERT INTO tbl_book (title, isbn, year_of_publication, genre_id, author_id,date_created,available_book_count,price)
+  VALUES (@title, @isbn, @year_of_publication, @genre_id, @author_id, GETDATE(),@available_book_count,@price)
 
-SELECT @book_id = SCOPE_IDENTITY();
+SELECT * from tbl_book where book_id = SCOPE_IDENTITY();
 RETURN @@Error
     GO
 
@@ -77,7 +77,19 @@ AS
 DECLARE @offset INT
 SET @offset =  (@page_num - 1) * @page_size
 
-DECLARE @select varchar(max) = 'SELECT b.*, a.*, g.*
+DECLARE @select varchar(max) = 'SELECT  b.book_id,
+                                  b.book_id AS book_id,
+                                  b.title AS title,
+                                  b.isbn AS isbn,
+                                  b.year_of_publication AS year_of_publication,
+                                  b.genre_id AS genre_id,
+                                  b.author_id AS author_id,
+                                  b.price AS price,
+                                  b.available_book_count AS available_book_count,
+                                  b.date_created AS date_created,
+                                  a.author_id AS author_id,
+                                  a.author_name AS author_name,                                  g.genre_id AS genre_id,
+                                  g.genre_name AS genre_name
           FROM tbl_book b (NOLOCK)
           LEFT JOIN tbl_author a ON b.author_id = a.author_id
           LEFT JOIN tbl_genre g ON b.genre_id = g.genre_id'
@@ -142,6 +154,7 @@ CREATE PROCEDURE psp_update_book
   @year_of_publication             INT,
   @genre_id                        BIGINT,
   @author_id                       BIGINT,
+  @price                           DECIMAL(10, 2)
 
 AS
 
@@ -151,8 +164,9 @@ SET
     isbn = @isbn,
     year_of_publication = @year_of_publication,
     genre_id = @genre_id,
-    author_id = @author_id
-WHERE tbl_book = @tbl_book
+    author_id = @author_id,
+    price=@price
+WHERE book_id = @book_id
 
 SELECT * FROM tbl_book WHERE book_id = @book_id
     RETURN @@Error

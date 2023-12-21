@@ -51,7 +51,7 @@ public class BookDaoImpl extends BaseDao<BookResponse> implements BookDao {
 
     createJdbcCall = new SimpleJdbcCall(jdbcTemplate)
         .withProcedureName("psp_create_book")
-        .returningResultSet(SINGLE_RESULT, BeanPropertyRowMapper.newInstance(Book.class));
+        .returningResultSet(SINGLE_RESULT, new BookRowMapper());
 
     searchBookByIsbn = new SimpleJdbcCall(jdbcTemplate)
         .withProcedureName("psp_search_books_by_isbn")
@@ -77,27 +77,25 @@ public class BookDaoImpl extends BaseDao<BookResponse> implements BookDao {
         .addValue("genre_id", model.getGenreId())
         .addValue("author_id", model.getAuthorId())
         .addValue(ISBN, model.getIsbn())
-        .addValue("available_book_count",model.getAvailableBookCount())
+        .addValue("available_book_count",model.getAvailableBookCount()!=null?model.getAvailableBookCount():0)
         .addValue(YEAR_OF_PUBLICATION, model.getYearOfPublication());
 
     Map<String, Object> m = createJdbcCall.execute(in);
-    Long id = (Long) m.get("book_id");
-    model.setId(id.intValue());
-
-    return model;
+    List<Book> result = (List<Book>) m.get(SINGLE_RESULT);
+    return result.isEmpty() ? null : result.get(0);
   }
 
-  public Page<BookResponse> searchBooksByIsbn(BookSearchParams params) {
+  public BookResponse searchBooksByIsbn(String isbn) {
     SqlParameterSource in = new MapSqlParameterSource()
-        .addValue("isbn", params.getIsbn());
+        .addValue("isbn",isbn);
     Map<String, Object> m = searchBookByIsbn.execute(in);
     List<BookResponse> content = (List<BookResponse>) m.get(MULTIPLE_RESULT);
     if (content.isEmpty()) {
       throw new NotFoundException(OnlineBookStoreResponseCode.ENTITY_NOT_FOUND.getCode(),
           "Records not found");
     }
-    Long count = Long.valueOf(content.size());
-    return new Page(count, content);
+
+    return content.get(0);
   }
 
 
@@ -123,6 +121,10 @@ public class BookDaoImpl extends BaseDao<BookResponse> implements BookDao {
     return new Page(count, content);
   }
 
+  @Override
+  public void updateBookInventory(Book book) {
+
+  }
 
 
   public BookResponse retrieveBookById(Integer id) {

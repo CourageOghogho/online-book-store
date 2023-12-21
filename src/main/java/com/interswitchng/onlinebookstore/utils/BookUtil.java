@@ -13,7 +13,7 @@ public class BookUtil {
   }
 
   public static String bookIsbnValidator(String isbn){
-    if (!Pattern.matches("[0-9\\-]+", isbn)) {
+    if (!Pattern.matches("[0-9-]+", isbn)) {
       throw new InvalidRequestException("Book ISBN", "Book ISBN must contain only numbers and dash(-)");
     }
     return isbn;

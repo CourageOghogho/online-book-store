@@ -29,7 +29,7 @@ public class AuthorServiceImpl implements AuthorService {
 
   @Override
   public Author retrieveAuthorById(Integer authorId) {
-    var response=authorDao.retrieveBookById(authorId);
+    var response=authorDao.retrieveAuthorById(authorId);
 
     if(response==null) throw new ServiceLayerException("Something went wrong");
     return response;

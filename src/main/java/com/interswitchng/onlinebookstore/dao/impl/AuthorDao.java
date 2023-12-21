@@ -1,6 +1,7 @@
 package com.interswitchng.onlinebookstore.dao.impl;
 
 import com.interswitchng.onlinebookstore.dao.BaseDao;
+import com.interswitchng.onlinebookstore.dao.util.AuthorRowMapper;
 import com.interswitchng.onlinebookstore.dao.util.BookRowMapper;
 import com.interswitchng.onlinebookstore.model.Author;
 import com.interswitchng.onlinebookstore.model.Book;
@@ -29,17 +30,17 @@ public class AuthorDao extends BaseDao  {
 
     createJdbcCall = new SimpleJdbcCall(jdbcTemplate)
         .withProcedureName("psp_create_author")
-        .returningResultSet(SINGLE_RESULT, BeanPropertyRowMapper.newInstance(Book.class));
+        .returningResultSet(SINGLE_RESULT, new AuthorRowMapper());
 
     retrieveOneJdbcCall = new SimpleJdbcCall(jdbcTemplate)
         .withProcedureName("psp_retrieve_author_by_id")
-        .returningResultSet(SINGLE_RESULT, new BookRowMapper());
+        .returningResultSet(SINGLE_RESULT, new AuthorRowMapper());
 
 
     retrieveManyJdbcCall = new SimpleJdbcCall(jdbcTemplate).withProcedureName(
             "psp_retrieve_all_author")
         .returningResultSet(MULTIPLE_RESULT,
-            BeanPropertyRowMapper.newInstance(Author.class));
+           new AuthorRowMapper());
 
   }
 
@@ -48,13 +49,11 @@ public class AuthorDao extends BaseDao  {
         .addValue(AUTHOR, model.getName());
 
     Map<String, Object> m = createJdbcCall.execute(in);
-    Long id = (Long) m.get("author_id");
-    model.setId(id.intValue());
-
-    return model;
+    List<Author> result = (List<Author>) m.get(SINGLE_RESULT);
+    return result.isEmpty() ? null : result.get(0);
   }
 
-  public Author retrieveBookById(Integer id) {
+  public Author retrieveAuthorById(Integer id) {
     SqlParameterSource in = new MapSqlParameterSource().addValue("id", id);
     Map<String, Object> m = retrieveOneJdbcCall.execute(in);
     List<Author> result = (List<Author>) m.get(SINGLE_RESULT);

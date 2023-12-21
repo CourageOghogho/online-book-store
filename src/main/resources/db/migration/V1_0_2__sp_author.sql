@@ -9,10 +9,10 @@ CREATE PROCEDURE psp_create_author
   @author_name                           VARCHAR(255)
 
 AS
-  INSERT INTO tbl_book (author_name, date_created)
+  INSERT INTO tbl_author (author_name, date_created)
   VALUES (@author_name, GETDATE())
 
-SELECT @author_id = SCOPE_IDENTITY();
+SELECT * FROM tbl_author where author_id=SCOPE_IDENTITY();
 RETURN @@Error
     GO
 

@@ -1,6 +1,7 @@
-package com.interswitchng.onlinebookstore.api.inventory;
+package com.interswitchng.onlinebookstore.api;
 
 import com.interswitchng.onlinebookstore.dto.AuthorRequest;
+import com.interswitchng.onlinebookstore.dto.BaseResponse;
 import com.interswitchng.onlinebookstore.dto.BookResponse;
 import com.interswitchng.onlinebookstore.dto.BookSearchParams;
 import com.interswitchng.onlinebookstore.dto.GenreRequest;
@@ -11,7 +12,6 @@ import com.interswitchng.onlinebookstore.service.AuthorService;
 import com.interswitchng.onlinebookstore.service.BookService;
 import com.interswitchng.onlinebookstore.service.GenreService;
 import java.util.List;
-import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,30 +42,31 @@ public class BookInventoryController {
     return ResponseEntity.ok(bookService.retrieveByBookId(bookId));
   }
 
-  @PostMapping("authors")
-  public ResponseEntity<Author> createAuthor(@Valid @RequestBody AuthorRequest request) {
+  @PostMapping("/authors")
+  public ResponseEntity<Author> createAuthor( @RequestBody AuthorRequest request) {
     return ResponseEntity.ok(authorService.createAuthor(request));
   }
 
-  @GetMapping("authors/{authorId}")
+  @GetMapping("/authors/{authorId}")
   public ResponseEntity<Author> retrieveAuthorById(@PathVariable(required = true) Integer authorId) {
     return ResponseEntity.ok(authorService.retrieveAuthorById(authorId));
   }
-  @GetMapping("authors")
+  @GetMapping("/authors")
   public ResponseEntity<List<Author>> retrieveAllAuthor() {
     return ResponseEntity.ok(authorService.retrieveAllAuthor());
   }
 
-  @PostMapping("genres")
-  public ResponseEntity<Genre> createGenre(@Valid @RequestBody GenreRequest request) {
+  @PostMapping("/genres")
+  public ResponseEntity<BaseResponse> createGenre( @RequestBody GenreRequest request) {
     return ResponseEntity.ok(genreService.createGenre(request));
   }
 
-  @GetMapping("genres/{genreId}")
+  @GetMapping(value = "/genres/{genreId}")
+
   public ResponseEntity<Genre> retrieveGenreById(@PathVariable(required = true) Integer genreId) {
     return ResponseEntity.ok(genreService.retrieveGenreById(genreId));
   }
-  @GetMapping("genres")
+  @GetMapping("/genres")
   public ResponseEntity<List<Genre>> retrieveAllGenres() {
     return ResponseEntity.ok(genreService.retrieveAllGenres());
   }

@@ -14,4 +14,5 @@ public interface BookService {
   BookResponse retrieveByBookId( Integer bookId);
 
 
+  Book updateBookInventory(Book book);
 }

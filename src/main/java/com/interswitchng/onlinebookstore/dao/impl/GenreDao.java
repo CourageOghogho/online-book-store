@@ -2,6 +2,7 @@ package com.interswitchng.onlinebookstore.dao.impl;
 
 import com.interswitchng.onlinebookstore.dao.BaseDao;
 import com.interswitchng.onlinebookstore.dao.util.BookRowMapper;
+import com.interswitchng.onlinebookstore.dao.util.GenreRowMapper;
 import com.interswitchng.onlinebookstore.model.Author;
 import com.interswitchng.onlinebookstore.model.Book;
 import com.interswitchng.onlinebookstore.model.Genre;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class GenreDao extends BaseDao<Genre> {
 
+  private SimpleJdbcCall retrieveGenresJdbcCall;
 
   @Autowired
   @Override
@@ -28,17 +30,17 @@ public class GenreDao extends BaseDao<Genre> {
 
     createJdbcCall = new SimpleJdbcCall(jdbcTemplate)
         .withProcedureName("psp_create_genre")
-        .returningResultSet(SINGLE_RESULT, BeanPropertyRowMapper.newInstance(Book.class));
+        .returningResultSet(SINGLE_RESULT, new GenreRowMapper());
 
     retrieveOneJdbcCall = new SimpleJdbcCall(jdbcTemplate)
         .withProcedureName("psp_retrieve_genre_by_id")
-        .returningResultSet(SINGLE_RESULT, new BookRowMapper());
+        .returningResultSet(SINGLE_RESULT, new GenreRowMapper());
 
 
-    retrieveManyJdbcCall = new SimpleJdbcCall(jdbcTemplate).withProcedureName(
+    retrieveGenresJdbcCall = new SimpleJdbcCall(jdbcTemplate).withProcedureName(
             "psp_retrieve_all_genre")
         .returningResultSet(MULTIPLE_RESULT,
-            BeanPropertyRowMapper.newInstance(Author.class));
+            new GenreRowMapper());
 
   }
 
@@ -60,10 +62,10 @@ public class GenreDao extends BaseDao<Genre> {
     return result.isEmpty() ? null : result.get(0);
   }
 
-  public List<Genre> getAllAuthors() {
+  public List<Genre> getAllGenres() {
 
     SqlParameterSource recList = new MapSqlParameterSource();
-    Map m = retrieveManyJdbcCall.execute(recList);
+    Map m = retrieveGenresJdbcCall.execute(recList);
     return (List<Genre>) m.get(MULTIPLE_RESULT);
 
   }

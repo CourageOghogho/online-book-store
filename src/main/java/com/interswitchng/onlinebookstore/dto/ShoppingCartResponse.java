@@ -1,15 +1,16 @@
 package com.interswitchng.onlinebookstore.dto;
 
 import com.interswitchng.onlinebookstore.model.CartItem;
+import java.math.BigDecimal;
 import java.util.List;
 import lombok.Data;
 
 @Data
 public class ShoppingCartResponse {
   private Integer cartId;
-  private Integer userId;
-  private Data createdAt;
+  private String userName;
+  private BigDecimal totalPrice;
 
-  private List<CartItem> items;
+  private List<CartItemResponse> items;
 
 }
